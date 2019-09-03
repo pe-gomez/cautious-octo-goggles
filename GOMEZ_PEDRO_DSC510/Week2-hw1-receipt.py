@@ -20,12 +20,9 @@ intallation_cost = number_of_feet * 0.87
 
 # Print a receipt for the user including the company name, number of feet of fiber to be installed,
 #   the calculated cost, and total cost in a legible format.
-print ("\nReceipt for: %s" % (company_name))
-
-#print ("The installtion cost will be: %d * .87 = %d dollars" % (number_of_feet, intallation_cost))
-print ("The installtion cost will be: ",number_of_feet,"* 0.87 =",int(intallation_cost*100+.5)/100," dollars" )
-print (intallation_cost)
-print ("The installtion cost will be: ",number_of_feet,"* .87 =",intallation_cost," dollars" )
+print ("\nReceipt for:" , company_name)
+print ("\nFeed of cable to be installed:",number_of_feet)
+print (" The installtion cost will be:",number_of_feet,"* 0.87 =",int(intallation_cost*100+.5)/100," dollars" )
 
 
 #Include appropriate comments throughout the program.
