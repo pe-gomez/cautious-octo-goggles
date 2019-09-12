@@ -31,13 +31,12 @@ if number_of_feet <= 0:
     sys.exit(1)
 
 # is there a bulk discount
-if number_of_feet >500:
+if number_of_feet > 500:
     inst_rate = 0.5
-elif number_of_feet >250:
+elif number_of_feet > 250:
     inst_rate = 0.7
-elif number_of_feet >100:
+elif number_of_feet > 100:
     inst_rate = 0.8
-
 else:
     inst_rate = 0.87
 
@@ -50,8 +49,5 @@ intallation_cost = number_of_feet * inst_rate
 print("==============================================")
 print("\nReceipt for:", company_name)
 print("\nFeet of cable to be installed:", number_of_feet)
-print(
-    f"\n    Undiscounted cost would have been: {number_of_feet} * 0.87 = {round(number_of_feet * 0.87,2)} dollars\n")
-
-print(
-    f"Your actual installation cost will be: {number_of_feet} * {inst_rate} = {round(intallation_cost,2)} dollars")
+print(f"\n    Undiscounted cost would have been: {number_of_feet} * 0.87 = {round(number_of_feet * 0.87, 2)} dollars\n")
+print(f"Your actual installation cost will be: {number_of_feet} * {inst_rate} = {round(intallation_cost, 2)} dollars")
