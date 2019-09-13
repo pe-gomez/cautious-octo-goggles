@@ -1,4 +1,4 @@
-#   File: Week2-hw1-receipt.py
+#   File: Week2-hw1-pgomez-receipt.py
 #   Name: Pedro E Gomez
 #   Date: 9-sep-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
@@ -20,7 +20,7 @@ try:
     number_of_feet = float(input("Feet of FO cable to be installed: "))
 except IndexError:
     print("**** Quantity of cable must be supplied!!!")
-    sys.exit(1)  # abort execution
+    sys.exit(1)
 except ValueError:
     print("**** Value entered must be a valid quantity!!!")
     sys.exit(1)
@@ -39,7 +39,6 @@ elif number_of_feet > 100:
     inst_rate = 0.8
 else:
     inst_rate = 0.87
-
 
 # Calculate the installation cost of fiber optic
 intallation_cost = number_of_feet * inst_rate
