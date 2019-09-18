@@ -2,7 +2,7 @@
 #   Name: Pedro E Gomez
 #   Date: 16-sep-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
-#   Desc: Week 3 assignment; program to calculate installation cost per foot of FO cable and evaluate a bulk discount.
+#   Desc: Week 4 assignment; program to calculate installation cost per foot of FO cable and evaluate a bulk discount.
 #
 # Usage: User enters company name and amount of FO cable installed, program presents receipt with the anticipated cost. Calculate the cost of fiber optic cable installation by multiplying the number of feet needed by $0.87. If the user purchases more than 100 feet they are charged $0.80 per foot. If the user purchases more than 250 feet they will be charged $0.70 per foot. If they purchase more than 500 feet, they will be charged $0.50 per foot.
 #
