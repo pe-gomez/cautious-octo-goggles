@@ -1,6 +1,6 @@
 #   File: Week4-hw1-pgomez-receipt.py
 #   Name: Pedro E Gomez
-#   Date: 9-sep-2019
+#   Date: 16-sep-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
 #   Desc: Week 3 assignment; program to calculate installation cost per foot of FO cable and evaluate a bulk discount.
 #
@@ -12,7 +12,9 @@ def inst_calc(number_of_feet, inst_rate=0.87):
     ''' calculate the price of installation, 0.87 is the default if not rate passed  '''
     return number_of_feet * inst_rate
 
+
 import sys
+
 print("Welcome to the Installation Cost Calculator.")  # Display a welcome message for your user.
 
 # Retrieve the company name from the user.
@@ -46,8 +48,8 @@ else:
     inst_rate = 0.87
 
 # Calculate the installation cost of fiber optic
-#intallation_cost = number_of_feet * inst_rate
-intallation_cost = inst_calc (number_of_feet , inst_rate)
+# intallation_cost = number_of_feet * inst_rate
+intallation_cost = inst_calc(number_of_feet, inst_rate)
 
 
 # Print a receipt for the user including the company name, number of feet of fiber to be installed,
