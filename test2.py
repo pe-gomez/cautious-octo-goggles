@@ -35,13 +35,22 @@ info = {'name': 'John', 'age': 22}
 
 student_info('Student Info:', name='John', age=22)
 
+
 def myFun(**kwargs):
     for key, value in kwargs.items():
-        print ("%s == %s" %(key, value))
+        print("%s==%s" % (key, value))
+
+
+print(datetime.datetime.now())
+
+import datetime
+
 
 def student_info(*args):
     pass
 
+
 print(student_info())
+
 
 def my_func(fargs, *args, **kwargs)
