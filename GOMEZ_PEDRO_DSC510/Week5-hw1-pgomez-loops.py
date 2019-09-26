@@ -24,31 +24,49 @@ def performCalculation(myop):
 
     print(f"\n{fnum} {myop} {snum} = {myres}\n")
 
+
 def calculateAverage():
-    n=0
-    while n==0:
+    n = 0
+    mytot=0
+    myentry=0
+    while n == 0:
         try:
             n = float(input("how many numbers to input: "))
         except ValueError:
             print("**** Value entered must be a valid quantity!!!")
-            n=0
-        if n!=int(n) or n<1:
+            n = 0
+        if n != int(n) or n < 1:
             print("**** Value entered must be a positive whole number!!!")
             n = 0
+
+    for i in range(int(n)):
+        while myentry == 0:
+            try:
+                myentry = float(input("entry #: "+str(i)))
+            except ValueError:
+                print("**** Value entered must be a valid quantity!!!")
+                myentry = 0
+        mytot=mytot+myentry
+
+    print (f"Avarage of the {n} numbers is: {mytot/n}")
+
 
 import sys
 
 myop = ''
 
+while myop not in ['e', 'E']:
+    while myop not in ['+', '-', '*', '/', 'a', 'A', 'e', 'E']:
+        print("\n    (+ to add, - to subtract, * to multiply, / to divide, A to Average, E to EXIT)")
+        myop = input("Please enter the operation to perform  :")
 
-while myop not in ['+', '-', '*', '/','A']:
-    myop = input("Please enter the operation to perform (+, -, *, /, A) :")
+    #perform math calcs
+    if myop in ['+', '-', '*', '/']: performCalculation(myop)
 
-if myop in ['+', '-', '*', '/']: performCalculation(myop)
+    #perform average
+    if myop in ['a', 'A']: calculateAverage()
 
-if myop =='A': calculateAverage()
-
-
+print("\n\nHave a nice day!!!)")
 
 '''
 print("Welcome to the Installation Cost Calculator.")  # Display a welcome message for your user.
