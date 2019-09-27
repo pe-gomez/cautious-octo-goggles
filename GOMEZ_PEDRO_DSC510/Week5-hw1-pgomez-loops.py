@@ -42,8 +42,10 @@ def calculateAverage():
             print("**** Value entered must be a positive whole number!!!")
             n = 0
 
+    n = int(n)
+
     # ask for all entries to average
-    for i in range(1, int(n) + 1):
+    for i in range(1, n + 1):
         myentry = 0
         while myentry == 0:
             try:
@@ -53,13 +55,13 @@ def calculateAverage():
                 myentry = 0
         mytot = mytot + myentry
 
-    print(f"Avarage of the {n} numbers is: {mytot / n}")
+    print(f"\nAvarage of the {n} numbers is: {mytot / n}")
 
 import sys
 
-myop = ''   #holder for action to take (initialize to blank)
-
 while myop not in ['e', 'E']:
+
+    myop = ''  # holder for action to take (initialize to blank)
 
     print("\n    (+ to add, - to subtract, * to multiply, / to divide, A to Average, E to EXIT)\n")
 
@@ -73,8 +75,5 @@ while myop not in ['e', 'E']:
     # perform average
     if myop in ['a', 'A']:
         calculateAverage()
-
-    # reset to go back and ask again
-    myop = ''
 
 print("\n\nHave a nice day!!!)")
