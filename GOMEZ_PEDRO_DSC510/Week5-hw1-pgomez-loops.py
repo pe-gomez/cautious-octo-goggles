@@ -16,12 +16,10 @@ def performCalculation(myop):
     print(f"performing {myop} of two numbers")
     fnum = float(input(" Enter First number: "))
     snum = float(input("Enter Second number: "))
-
     if myop == '+': myres = fnum + snum
     if myop == '-': myres = fnum - snum
     if myop == '*': myres = fnum * snum
     if myop == '/': myres = fnum / snum
-
     print(f"\n{fnum} {myop} {snum} = {myres}\n")
 
 
@@ -38,7 +36,6 @@ def calculateAverage():
         if n != int(n) or n < 1:
             print("**** Value entered must be a positive whole number!!!")
             n = 0
-
     for i in range(int(n)):
         while myentry == 0:
             try:
@@ -47,7 +44,6 @@ def calculateAverage():
                 print("**** Value entered must be a valid quantity!!!")
                 myentry = 0
         mytot=mytot+myentry
-
     print (f"Avarage of the {n} numbers is: {mytot/n}")
 
 
