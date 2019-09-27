@@ -25,6 +25,7 @@ def performCalculation(myop):
 
 def calculateAverage():
     n = 0
+    i=1
     mytot=0
     myentry=0
     while n == 0:
@@ -36,10 +37,11 @@ def calculateAverage():
         if n != int(n) or n < 1:
             print("**** Value entered must be a positive whole number!!!")
             n = 0
-    for i in range(int(n)):
+    for i in range(1,int(n)+1):
+        myentry=0
         while myentry == 0:
             try:
-                myentry = float(input("entry #: "+str(i)))
+                myentry = float(input("entry #"+str(i)+": "))
             except ValueError:
                 print("**** Value entered must be a valid quantity!!!")
                 myentry = 0
@@ -53,14 +55,17 @@ myop = ''
 
 while myop not in ['e', 'E']:
     while myop not in ['+', '-', '*', '/', 'a', 'A', 'e', 'E']:
-        print("\n    (+ to add, - to subtract, * to multiply, / to divide, A to Average, E to EXIT)")
-        myop = input("Please enter the operation to perform  :")
+        print("\n    (+ to add, - to subtract, * to multiply, / to divide, A to Average, E to EXIT)\n")
+        myop = input("Please select operation to perform  : ")
 
     #perform math calcs
     if myop in ['+', '-', '*', '/']: performCalculation(myop)
 
     #perform average
     if myop in ['a', 'A']: calculateAverage()
+
+    #reset to go back and ask again
+    myop = ''
 
 print("\n\nHave a nice day!!!)")
 
