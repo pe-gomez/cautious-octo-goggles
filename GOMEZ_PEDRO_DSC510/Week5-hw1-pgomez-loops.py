@@ -59,9 +59,11 @@ def calculateAverage():
 
 import sys
 
+myop = ''  # holder for action to take (initialize to blank)
+
 while myop not in ['e', 'E']:
 
-    myop = ''  # holder for action to take (initialize to blank)
+    myop = ''  # always initialize to force the question
 
     print("\n    (+ to add, - to subtract, * to multiply, / to divide, A to Average, E to EXIT)\n")
 
