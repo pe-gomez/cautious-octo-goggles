@@ -40,6 +40,6 @@ while my_input == "":
 # order the entries (evaluation done in the sort)
 temperatures.sort()
 
-print(f"\n\n              largest temperature: {temperatures[len(temperatures) - 1]}")
-print(f"             smallest temperature: {temperatures[0]}")
+print(f"\n\n               largest temperature: {temperatures[- 1]}")
+print(f"              smallest temperature: {temperatures[0]}")
 print(f"number of temperatures in the list: {len(temperatures)}")
