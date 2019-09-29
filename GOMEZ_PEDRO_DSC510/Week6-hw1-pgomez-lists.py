@@ -37,7 +37,7 @@ while my_input == "":
     temperatures.append(my_input)
     my_input = ""  # always initialize to force the question
 
-# order the entries
+# order the entries (evaluation done in the sort)
 temperatures.sort()
 
 print(f"\n\n              largest temperature: {temperatures[len(temperatures) - 1]}")
