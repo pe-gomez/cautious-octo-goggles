@@ -29,7 +29,7 @@ while my_input == "":
     try:
         my_input = float(my_input)
     except ValueError:
-        print("{my_input] is not a valid entry!!!")
+        print(f"{my_input} is not a valid entry!!!")
         my_input = ""  # always initialize to force the question
         continue  # keep trying for a number
 
@@ -37,9 +37,9 @@ while my_input == "":
     temperatures.append(my_input)
     my_input = ""  # always initialize to force the question
 
-#order the entries
+# order the entries
 temperatures.sort()
 
-print(f"\n\n              largest temperature: {temperatures[len(temperatures)-1]}")
+print(f"\n\n              largest temperature: {temperatures[len(temperatures) - 1]}")
 print(f"             smallest temperature: {temperatures[0]}")
-print(f"number of temperatures in the list: {len(temperatures)+1}")
+print(f"number of temperatures in the list: {len(temperatures)}")
