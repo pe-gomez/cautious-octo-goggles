@@ -82,7 +82,7 @@ The map() function
 
 xbyy = lambda x, y: x * y
 print(xbyy(2,3))
-'''
+
 
 # empty dictionary
 my_dict = {}
@@ -100,3 +100,29 @@ if 1 in myD.keys():
 
 for (key, value) in myD.items():
     print(key, " :: ", value)
+'''
+odd_square = [x ** 2 for x in range(1, 11) if x % 2 == 1]
+print (odd_square)
+
+# for understanding, above generation is same as,
+odd_square = []
+for x in range(1, 11):
+    if x % 2 == 1:
+        odd_square.append(x ** 2)
+print (odd_square)
+
+# below list contains power of 2 from 1 to 8
+power_of_2 = [2 ** x for x in range(1, 9)]
+print(power_of_2)
+
+my_letters = [chr(x) for x in range(ord('A'), ord('Z') + 1)]
+print(my_letters)
+
+mystring="my zip code is 90210 and I like in California"
+myzip=[x for x in mystring.split(' ') if x.isnumeric()]
+print (myzip)
+
+# mylist = [[i, j, i * j] for i in [5, 10] for j in range(1, 11)]
+mylist = [[str(i) + " * " + str(j), i * j] for i in [5, 10] for j in range(1, 11)]
+for x in mylist:
+    print(x)
