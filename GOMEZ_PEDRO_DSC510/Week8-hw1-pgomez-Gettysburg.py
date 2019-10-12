@@ -20,7 +20,7 @@
 # In the main function, you will need to open the file. We will cover more regarding opening of files next week but I wanted to provide you with the block of code you will utilize to open the file, see below.
 
 ##
-
+'''
 temperatures = []
 
 my_input = ""
@@ -51,3 +51,15 @@ temperatures.sort()
 print(f"\n\n               largest temperature: {temperatures[- 1]}")
 print(f"              smallest temperature: {temperatures[0]}")
 print(f"number of temperatures in the list: {len(temperatures)}")
+'''
+
+word_count=dict()
+mypath='C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
+gba_file=open(mypath,'r')
+for line in gba_file:
+    for myreplace in [',','-','1','2','3','4','5','6','7','8','9','0']:
+        line=line.replace(myreplace,'')
+    line=line.lower()
+    mywords = line.split()
+    for myword in mywords:
+        print(myword)
