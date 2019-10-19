@@ -27,57 +27,41 @@
 # of files next week but I wanted to provide you with the block of code you will utilize to
 # open the file, see below.
 
-##
-'''
-temperatures = []
+def add_word(mydictionary, mykey):
+    mydictionary.update({mykey: 1})
 
-my_input = ""
-
-# read until user ends
-while my_input == "":
-
-    my_input = input("Please enter temperature, (e or E to END)  : ")
-
-    # get out if the user is done
-    if my_input in ['e', 'E']: break
-
-    # check for number
-    try:
-        my_input = float(my_input)
-    except ValueError:
-        print(f"{my_input} is not a valid entry!!!")
-        my_input = ""  # always initialize to force the question
-        continue  # keep trying for a number
-
-    # append the temperature
-    temperatures.append(my_input)
-    my_input = ""  # always initialize to force the question
-
-# order the entries (evaluation done in the sort)
-temperatures.sort()
-
-print(f"\n\n               largest temperature: {temperatures[- 1]}")
-print(f"              smallest temperature: {temperatures[0]}")
-print(f"number of temperatures in the list: {len(temperatures)}")
-'''
-
-word_count = dict()
-mypath = 'C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
-gba_file = open(mypath, 'r')
-for line in gba_file:  # read file, line by line
-    for myreplace in ['.', ',', '-', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
+def Process_line(line, mydictionary):
+    for myreplace in ['.', ',', '-']:
         line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
+
     mywords = line.split()
 
     for myword in mywords:
         mykey = myword.rstrip()
 
-        if mykey not in word_count.keys():
-            word_count.update({mykey: 0})
-        word_count.update({mykey : word_count.get(mykey) + 1})
-        #print("{0}  {1}".format(mykey, word_count.get(mykey)))
-print ("\n Lenght of the dictionary: {0}\n".format(len(word_count)))
-print(" {0:<18} {1}".format("Word", "Count"))
-print("{0:-<25}".format(" "))  #25 dashes
-for (mykey, myvalue) in sorted(word_count.items()):  #print sorted dictionary
-    print(" {0:<20} {1}".format(mykey, myvalue))
+        if mykey not in mydictionary.keys():  # add word if not in dictionary
+            add_word(mydictionary, mykey)
+            continue
+
+        mydictionary[mykey] = mydictionary[mykey] + 1
+
+def Pretty_print(mydictionary):
+    print("\n Lenght of the dictionary: {0}\n".format(len(mydictionary)))
+    print(" {0:<18} {1}".format("Word", "Count"))
+    print("{0:-<25}".format(" "))  # 24 dashes
+    for (mykey, myvalue) in sorted(mydictionary.items()):  # print sorted dictionary
+        print(" {0:<20} {1}".format(mykey, myvalue))
+
+def main():
+    #
+    word_count = dict()
+    mypath = 'C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
+    gba_file = open(mypath, 'r')
+
+    for line in gba_file:  # read file, line by line
+        Process_line(line, word_count)
+
+    Pretty_print(word_count)
+
+if __name__ == "__main__":
+    main()
