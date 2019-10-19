@@ -30,6 +30,7 @@
 def add_word(mydictionary, mykey):
     mydictionary.update({mykey: 1})
 
+
 def Process_line(line, mydictionary):
     for myreplace in ['.', ',', '-']:
         line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
@@ -45,12 +46,14 @@ def Process_line(line, mydictionary):
 
         mydictionary[mykey] = mydictionary[mykey] + 1
 
+
 def Pretty_print(mydictionary):
     print("\n Lenght of the dictionary: {0}\n".format(len(mydictionary)))
     print(" {0:<18} {1}".format("Word", "Count"))
     print("{0:-<25}".format(" "))  # 24 dashes
     for (mykey, myvalue) in sorted(mydictionary.items()):  # print sorted dictionary
         print(" {0:<20} {1}".format(mykey, myvalue))
+
 
 def main():
     #
@@ -62,6 +65,7 @@ def main():
         Process_line(line, word_count)
 
     Pretty_print(word_count)
+
 
 if __name__ == "__main__":
     main()
