@@ -38,6 +38,10 @@ def Process_line(line, mydictionary):
     for myreplace in ['.', ',', '-']:
         line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
 
+        #alternate method
+        #import string
+        #line = line.translate( line.maketrans('', '', string.punctuation))
+
     mywords = line.split()
 
     for myword in mywords:
@@ -65,8 +69,12 @@ def Pretty_print(mydictionary):
 def main():
     #
     word_count = dict()
-    mypath = 'C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
-    gba_file = open(mypath, 'r')
+    mypath = 'C:\\Use1rs\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
+    try:
+        gba_file = open(mypath, 'r')
+    except:
+        print(" File cannot be opened: ", mypath)
+        exit()
 
     for line in gba_file:  # read file, line by line
         Process_line(line, word_count)
