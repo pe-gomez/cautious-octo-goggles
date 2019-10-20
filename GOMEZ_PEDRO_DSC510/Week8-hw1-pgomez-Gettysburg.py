@@ -27,6 +27,9 @@
 # of files next week but I wanted to provide you with the block of code you will utilize to
 # open the file, see below.
 
+from collections import OrderedDict  # for later use in sorting the dict by value
+
+
 def add_word(mydictionary, mykey):
     mydictionary.update({mykey: 1})
 
@@ -51,7 +54,11 @@ def Pretty_print(mydictionary):
     print("\n Lenght of the dictionary: {0}\n".format(len(mydictionary)))
     print(" {0:<18} {1}".format("Word", "Count"))
     print("{0:-<25}".format(" "))  # 24 dashes
-    for (mykey, myvalue) in sorted(mydictionary.items()):  # print sorted dictionary
+
+    # create reverse sorted dictionary by value
+    mydictionary_s = OrderedDict(sorted(mydictionary.items(), key=lambda x: x[1], reverse=True))
+
+    for (mykey, myvalue) in (mydictionary_s.items()):  # print sorted dictionary
         print(" {0:<20} {1}".format(mykey, myvalue))
 
 
