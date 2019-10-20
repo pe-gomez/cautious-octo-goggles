@@ -1,4 +1,4 @@
-#   File: Week6-hw1-pgomez-lists.py
+#   File: Week8-hw1-pgomez-lists.py
 #   Name: Pedro E Gomez
 #   Date: 12-oct-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
@@ -27,7 +27,7 @@
 # of files next week but I wanted to provide you with the block of code you will utilize to
 # open the file, see below.
 
-from collections import OrderedDict  # for later use in sorting the dict by value
+from collections import OrderedDict  # for later use in storing the sorting dict by value
 
 
 def add_word(mydictionary, mykey):
