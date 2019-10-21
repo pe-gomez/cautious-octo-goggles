@@ -126,3 +126,15 @@ print (myzip)
 mylist = [[str(i) + " * " + str(j), i * j] for i in [5, 10] for j in range(1, 11)]
 for x in mylist:
     print(x)
+
+'''
+import json
+with open('states.jsom') as f:
+    data = jsom.load(f)
+for state in data['states']:
+    del state['area_codes']
+
+with open("myfile.txt","w") as f:
+    json.dump(data,f,indent=2)
+
+'''

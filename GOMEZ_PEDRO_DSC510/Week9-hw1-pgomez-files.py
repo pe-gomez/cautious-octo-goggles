@@ -1,6 +1,6 @@
-#   File: Week8-hw1-pgomez-lists.py
+#   File: Week9-hw1-pgomez-fils.py
 #   Name: Pedro E Gomez
-#   Date: 12-oct-2019
+#   Date: 20-oct-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
 #   Desc: Open the file and process each line.
 #
