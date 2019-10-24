@@ -33,19 +33,14 @@
 
 import os  # for testing existance of file and deleting them
 from collections import OrderedDict  # for later use in storing the sorting dict by value
-import string  # for fancy string manipulation
-
 
 def add_word(mydictionary, mykey):
     mydictionary.update({mykey: 1})
 
-
 def Process_line(line, mydictionary):
-    for myreplace in ['.', ',', '-']:
-        # line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
 
-        # alternate method (needs: import string)
-        line = line.lower().translate(line.maketrans('', '', string.punctuation))
+    #Remove unwanted characters
+    line = line.lower().translate(line.maketrans('', '', "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"))
 
     mywords = line.split()
 
