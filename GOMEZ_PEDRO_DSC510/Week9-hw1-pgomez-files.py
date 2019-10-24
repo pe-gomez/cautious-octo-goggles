@@ -1,8 +1,8 @@
-#   File: Week9-hw1-pgomez-fils.py
+#   File: Week9-hw1-pgomez-files.py
 #   Name: Pedro E Gomez
 #   Date: 20-oct-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
-#   Desc: Open the file and process each line.
+#   Desc: Open the file and process each line; open new file for output
 #
 # Usage: Open the file and process each line.
 # Either add each word to the dictionary with a frequency of 1 or update the word’s count by 1.
@@ -15,9 +15,13 @@
 # split out the words, and so on. Parameters are a line and the dictionary.
 # It calls the function add word with each processed word. No return value.
 #
-# Pretty_print: Because formatted printing can be messy and often particular to each
-# situation (meaning that we might need to modify it later), we separated out the
-# printing function. The parameter is a dictionary. No return value.
+# Create a new function called process_fie. This function will perform the same operations as pretty_print from week 8 however it will print to a file instead of to the screen.
+# Modify your main method to print the length of the dictionary to the file as opposed to the screen.
+# This will require that you open the file twice. Once in main and once in process_file.
+# Prompt the user for the filename they wish to use to generate the report.
+# Use the filename specified by the user to write the file.
+# This will require you to pass the file as an additional parameter to your new process_file function.
+#
 #
 # main: We will use a main function as the main program. As usual, it will open the file
 # and call process_line on each line. When finished, it will call pretty_print to print
@@ -27,7 +31,9 @@
 # of files next week but I wanted to provide you with the block of code you will utilize to
 # open the file, see below.
 
+import os  # for testing existance of file and deleting them
 from collections import OrderedDict  # for later use in storing the sorting dict by value
+import string  # for fancy string manipulation
 
 
 def add_word(mydictionary, mykey):
@@ -36,11 +42,10 @@ def add_word(mydictionary, mykey):
 
 def Process_line(line, mydictionary):
     for myreplace in ['.', ',', '-']:
-        line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
+        # line = line.replace(myreplace, '').lower()  # clean the line; set to lower case
 
-        #alternate method
-        #import string
-        #line = line.translate( line.maketrans('', '', string.punctuation))
+        # alternate method (needs: import string)
+        line = line.lower().translate(line.maketrans('', '', string.punctuation))
 
     mywords = line.split()
 
@@ -66,20 +71,60 @@ def Pretty_print(mydictionary):
         print(" {0:<20} {1}".format(mykey, myvalue))
 
 
+def process_file(mydictionary, out_path):
+    with open(out_path, "a") as out_file:
+        out_file.write(" {0:<18} {1}\n".format("Word", "Count"))  # headers for dictionary data
+        out_file.write("{0:-<25}\n".format(" "))  # 24 dashes
+
+        # create reverse sorted dictionary by value
+        mydictionary_s = OrderedDict(sorted(mydictionary.items(), key=lambda x: x[1], reverse=True))
+
+        for (mykey, myvalue) in (mydictionary_s.items()):  # print sorted dictionary
+            out_file.write(" {0:<20} {1}\n".format(mykey, myvalue))
+
+        out_file.close()
+
+
 def main():
     #
-    word_count = dict()
-    mypath = 'C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\week8program\\gettysburg.txt'
+    mydictionary = dict()
+    in_path = 'gettysburg.txt'
     try:
-        gba_file = open(mypath, 'r')
+        in_file = open(in_path, 'r')
     except:
-        print(" File cannot be opened: ", mypath)
+        print(" File cannot be opened: ", in_path)
         exit()
 
-    for line in gba_file:  # read file, line by line
-        Process_line(line, word_count)
+    for line in in_file:  # read file, line by line
+        Process_line(line, mydictionary)
 
-    Pretty_print(word_count)
+    # out_path = "myout.txt"  # if outputfile exists, delete it
+    out_path = ""
+    while out_path == "":
+
+        out_path = input("Please enter file name for output (hit ENTER for default: myout.txt) ")  # get file name
+        if out_path == "":
+            out_path = "myout.txt"
+
+        if os.path.exists(out_path):
+            myinput = input("{} exists, would you like to overwrite file? (y for yes)".format(out_path))
+            if myinput in ['y', 'Y']:
+                try:
+                    os.remove(out_path)
+                except:
+                    print("Error while deleting file ", out_path)
+            else:
+                out_path = ""
+                continue
+
+    print("\n\nUsing '{}'".format(out_path))
+
+    with open(out_path, "w") as out_file:
+        out_file.write("\n Lenght of the dictionary: {0}\n\n".format(len(mydictionary)))
+        out_file.close()
+
+    # Pretty_print(mydictionary)
+    process_file(mydictionary, out_path)
 
 
 if __name__ == "__main__":
