@@ -67,6 +67,7 @@ def main():
     #
     mydictionary = dict()
     in_path = 'gettysburg.txt'
+
     try:
         in_file = open(in_path, 'r')
     except:
@@ -76,7 +77,9 @@ def main():
     for line in in_file:  # read file, line by line
         Process_line(line, mydictionary)
 
-    # out_path = "myout.txt"  # if outputfile exists, delete it
+    in_file.close()  #close the input file since the method does not close automatically
+
+    # get the output file and process it
     out_path = ""
     while out_path == "":
 
@@ -85,7 +88,7 @@ def main():
             out_path = "myout.txt"
 
         if os.path.exists(out_path):
-            myinput = input("{} exists, would you like to overwrite file? (y for yes)".format(out_path))
+            myinput = input("'{}' exists, would you like to overwrite file? (y for yes)".format(out_path))
             if myinput in ['y', 'Y']:
                 try:
                     os.remove(out_path)
@@ -97,9 +100,11 @@ def main():
 
     print("\n\nUsing '{}'".format(out_path))
 
+    # write the dictionary length
     with open(out_path, "w") as out_file:
         out_file.write("\n Lenght of the dictionary: {0}\n\n".format(len(mydictionary)))
 
+    # build the report and save
     process_file(mydictionary, out_path)
 
 
