@@ -23,23 +23,20 @@
 # This will require you to pass the file as an additional parameter to your new process_file function.
 #
 #
-# main: We will use a main function as the main program. As usual, it will open the file
-# and call process_line on each line. When finished, it will call pretty_print to print
-# the dictionary.
 #
 # In the main function, you will need to open the file. We will cover more regarding opening
-# of files next week but I wanted to provide you with the block of code you will utilize to
-# open the file, see below.
+# of files
 
 import os  # for testing existance of file and deleting them
 from collections import OrderedDict  # for later use in storing the sorting dict by value
 
+
 def add_word(mydictionary, mykey):
     mydictionary.update({mykey: 1})
 
-def Process_line(line, mydictionary):
 
-    #Remove unwanted characters and lower case the line
+def Process_line(line, mydictionary):
+    # Remove unwanted characters and lower case the line
     line = line.lower().translate(line.maketrans('', '', "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"))
 
     mywords = line.split()
@@ -51,19 +48,7 @@ def Process_line(line, mydictionary):
             add_word(mydictionary, mykey)
             continue
 
-        mydictionary[mykey] = mydictionary[mykey] + 1
-
-
-def Pretty_print(mydictionary):
-    print("\n Lenght of the dictionary: {0}\n".format(len(mydictionary)))
-    print(" {0:<18} {1}".format("Word", "Count"))
-    print("{0:-<25}".format(" "))  # 24 dashes
-
-    # create reverse sorted dictionary by value
-    mydictionary_s = OrderedDict(sorted(mydictionary.items(), key=lambda x: x[1], reverse=True))
-
-    for (mykey, myvalue) in (mydictionary_s.items()):  # print sorted dictionary
-        print(" {0:<20} {1}".format(mykey, myvalue))
+        mydictionary[mykey] += 1
 
 
 def process_file(mydictionary, out_path):
@@ -76,8 +61,6 @@ def process_file(mydictionary, out_path):
 
         for (mykey, myvalue) in (mydictionary_s.items()):  # print sorted dictionary
             out_file.write(" {0:<20} {1}\n".format(mykey, myvalue))
-
-        out_file.close()
 
 
 def main():
@@ -116,9 +99,7 @@ def main():
 
     with open(out_path, "w") as out_file:
         out_file.write("\n Lenght of the dictionary: {0}\n\n".format(len(mydictionary)))
-        out_file.close()
 
-    # Pretty_print(mydictionary)
     process_file(mydictionary, out_path)
 
 
