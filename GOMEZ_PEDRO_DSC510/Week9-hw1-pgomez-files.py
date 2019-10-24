@@ -39,7 +39,7 @@ def add_word(mydictionary, mykey):
 
 def Process_line(line, mydictionary):
 
-    #Remove unwanted characters
+    #Remove unwanted characters and lower case the line
     line = line.lower().translate(line.maketrans('', '', "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"))
 
     mywords = line.split()
