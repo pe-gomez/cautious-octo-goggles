@@ -98,7 +98,7 @@ def main():
                 out_path = ""
                 continue
 
-    # print using some ANSI escape sequences for emphasis
+    # print to standard console using some ANSI escape sequences for emphasis
     # \x1b[37m for grey
     # \x1b[31m for red
     # \x1b[32m for green
