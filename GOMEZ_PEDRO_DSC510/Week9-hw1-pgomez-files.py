@@ -59,7 +59,7 @@ def process_file(mydictionary, out_path):
         # create reverse sorted dictionary by value
         mydictionary_s = OrderedDict(sorted(mydictionary.items(), key=lambda x: x[1], reverse=True))
 
-        for (mykey, myvalue) in (mydictionary_s.items()):  # print sorted dictionary
+        for (mykey, myvalue) in (mydictionary_s.items()):  # print formatted sorted dictionary
             out_file.write(" {0:<20} {1}\n".format(mykey, myvalue))
 
 
@@ -77,7 +77,7 @@ def main():
     for line in in_file:  # read file, line by line
         Process_line(line, mydictionary)
 
-    in_file.close()  #close the input file since the method does not close automatically
+    in_file.close()  # close the input file since the method does not close automatically
 
     # get the output file and process it
     out_path = ""
@@ -98,7 +98,15 @@ def main():
                 out_path = ""
                 continue
 
-    print("\n\nUsing '{}'".format(out_path))
+    # print using some ANSI escape sequences for emphasis
+    # \x1b[37m for grey
+    # \x1b[31m for red
+    # \x1b[32m for green
+    # \x1b[33m for yellow
+    # \x1b[34m for blue
+    # \x1b[0m for no-color
+    # \x1b[4m for underline
+    print("\n\nUsing \x1b[3m\x1b[34m{0}\x1b[0m in the \x1b[34m{1}\x1b[0m directory.".format(out_path, os.getcwd()))
 
     # write the dictionary length
     with open(out_path, "w") as out_file:
