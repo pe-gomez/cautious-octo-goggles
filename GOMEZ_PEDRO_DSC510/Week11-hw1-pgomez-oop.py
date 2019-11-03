@@ -16,3 +16,10 @@
 # Your program should print the total number of items in the cart.
 # Your program should print the total $ amount of the cart.
 # The output should be formatted as currency. Be sure to investigate the locale class. You will need to call locale.setlocale and locale.currency.
+import locale #currency formatting
+from datetime import datetime
+
+x=locale.setlocale( locale.LC_ALL, '' ) #setlocale
+locale.currency( 188518982.18, grouping=True )
+
+print (datetime.now())
