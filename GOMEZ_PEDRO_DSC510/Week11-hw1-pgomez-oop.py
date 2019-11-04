@@ -85,6 +85,7 @@ myCashRegister.addItem(9.85)
 myCashRegister.addItem(12.8)
 myCashRegister.addItem(6.5)
 myCashRegister.addItem(13)
+myCashRegister.addItem(10)
 
 print(myCashRegister.getCount())
 
@@ -98,4 +99,4 @@ print(myCashRegister.getCount())
 # print(len(myobjs))
 # print(myobjs)
 
-print(locale.currency(myCashRegister.getTotal(), 2, grouping=True))  # print with local currency locale
+print(locale.currency(myCashRegister.getTotal(), grouping=True))  # print with local currency locale
