@@ -25,7 +25,7 @@ class employee:
     @classmethod
     def from_string(cls, emp_str):
         first, last, pay = emp_str.split('-')
-        return cls(first, last, pay, 200)
+        return cls(first, last, pay,0)
 
     @staticmethod
     def is_workday(day):
@@ -33,11 +33,46 @@ class employee:
             return False
         return True
 
+class developer(employee):
+
+    def __init__(self, first, last, pay, prog_lang):
+        super().__init__(first, last, pay)
+        self.prog_lang=prog_lang
+
+class manager(employee):
+
+    def __init__(self, first, last, pay,temperatureK, employees=None):
+        super().__init__(first, last, pay,temperatureK)
+        if employees is None:
+            self.employees = []
+        else:
+            self.employees=employees
+
+    def add_emp(self,emp):
+        if emp not in self.employees:
+            self.employees.append(emp)
+
+    def remove_emp(self,emp):
+        if emp in self.employees:
+            self.employees.remove(emp)
+
+    def print_emps(self):
+        for emp in self.employees:
+            print('-->',emp.fullname())
+
+#print(help(developer))
+#print(help(employee))
 
 employee.set_raise_amt(1.05)
 
 emp_1 = employee('corey', 'schafer', 50000, 271)
 emp_2 = employee('test', 'user', 60000, 282)
+
+mgr_1=manager('peg','smith',100000,0,[emp_1])
+
+print(isinstance(mgr_1,manager)) #tells if a class is a subclass of other
+
+mgr_1.print_emps()
 
 # first, last, pay = 'jon-doe-7000'.split('-')
 # emp_3 = employee(first, last, pay, 200)
@@ -48,11 +83,11 @@ print(emp_2.first, emp_2.email, emp_2.temperatureF)
 
 print(emp_3.__dict__)
 
+'''
 #from datetime \
 import datetime
 print (employee.is_workday(datetime.datetime.now()))
 print (datetime.date(2019,11,3))
-
 
 class PartyAnimal:
     x = 0
@@ -67,3 +102,4 @@ an.party()
 an.party()
 an.party()
 PartyAnimal.party(an)
+'''
