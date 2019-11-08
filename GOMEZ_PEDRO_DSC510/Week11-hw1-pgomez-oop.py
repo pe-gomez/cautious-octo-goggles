@@ -35,13 +35,6 @@ def mydaypart():
         return 'Night'
 
 
-print(
-    "\n\n\x1b[4mHI, I hope you're having a Good {}, \x1b[0mWelcome to the Week 11 OOP programming assignment!!\n".format(
-        mydaypart()))
-
-x = locale.setlocale(locale.LC_ALL, '')  # setlocale
-
-
 class CashRegister:
 
     def __init__(self):  # take no arguments on the instance creation
@@ -60,12 +53,18 @@ class CashRegister:
     def getTotal(self):
         return self.itemtotal
 
+
 def main():
+    print(
+        "\n\n\x1b[4mHI, I hope you're having a Good {}, \x1b[0mWelcome to the Week 11 OOP programming assignment!!\n".format(
+            mydaypart()))
+
+    x = locale.setlocale(locale.LC_ALL, '')  # setlocale
 
     myCashRegister = CashRegister()  # create instance of CashRegister
 
     myinput = ''
-    while myinput not in ['q', 'Q']:  # extract joke until user presses any other key than Y/y
+    while myinput not in ['q', 'Q']:  # add to cart until user presses q/Q
         myinput = input("Please enter price for next item (q/Q to Quit): ")
         if myinput not in ['q', 'Q']:
             try:
@@ -81,13 +80,17 @@ def main():
             continue
 
     # time to display the cart totals
-    myGrandTotal = locale.currency(myCashRegister.getTotal(), grouping=True)  # total with local currency locale format
+    # total with local currency locale format
+    myGrandTotal = locale.currency(myCashRegister.getTotal(), grouping=True)
 
-    myNote = "\nCount of items: {0:>" + str(len(myGrandTotal) - 3) + "}"  # message to print with format inst
+    # message to print with format inst
+    myNote = "\nCount of items: {0:>" + str(len(myGrandTotal) - 3) + "}"
     print(myNote.format(myCashRegister.getCount()))  # print count
 
-    myNote = "         Total: {0:>" + str(len(myGrandTotal)) + "}"  # message to print with format inst
+    # message to print with format inst
+    myNote = "         Total: {0:>" + str(len(myGrandTotal)) + "}"
     print(myNote.format(myGrandTotal))  # print total
+
 
 if __name__ == "__main__":
     main()
