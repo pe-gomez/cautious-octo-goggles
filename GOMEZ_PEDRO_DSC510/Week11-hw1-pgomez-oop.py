@@ -19,8 +19,7 @@
 
 
 import locale  # currency formatting
-# from datetime import datetime
-import datetime
+import datetime  # for figuring out the part of day for greeting
 
 
 # function returns part of the day according to the hour of the day
@@ -36,14 +35,6 @@ def mydaypart():
         return 'Night'
 
 
-# print to standard console using some ANSI escape sequences for emphasis
-# \x1b[37m for grey
-# \x1b[31m for red
-# \x1b[32m for green
-# \x1b[33m for yellow
-# \x1b[34m for blue
-# \x1b[0m for no-color
-# \x1b[4m for underline
 print(
     "\n\n\x1b[4mHI, I hope you're having a Good {}, \x1b[0mWelcome to the Week 11 OOP programming assignment!!\n".format(
         mydaypart()))
@@ -51,52 +42,52 @@ print(
 x = locale.setlocale(locale.LC_ALL, '')  # setlocale
 
 
-# locale.currency(188518982.18, grouping=True)
-
-# print(datetime.datetime.now())
-
-
 class CashRegister:
 
-    def __init__(self):
-        self.itemcount = 0
-        self.itemtotal = 0
+    def __init__(self):  # take no arguments on the instance creation
+        self.itemcount = 0  # initialize on the instance cration
+        self.itemtotal = 0  # initialize on the instance cration
 
     def addItem(self, price):
         self.itemcount += 1
         self.itemtotal += price
 
+    # getter method for getCount
     def getCount(self):
         return self.itemcount
 
+    # getter method for getTotal
     def getTotal(self):
         return self.itemtotal
 
+def main():
 
-# def getCount():
-#    pass
+    myCashRegister = CashRegister()  # create instance of CashRegister
 
-myCashRegister = CashRegister()
-# print(CashRegister.itemcount)
+    myinput = ''
+    while myinput not in ['q', 'Q']:  # extract joke until user presses any other key than Y/y
+        myinput = input("Please enter price for next item (q/Q to Quit): ")
+        if myinput not in ['q', 'Q']:
+            try:
+                myprice = float(myinput)
 
-myCashRegister.addItem(1)
-myCashRegister.addItem(7.25)
-myCashRegister.addItem(9.85)
-myCashRegister.addItem(12.8)
-myCashRegister.addItem(6.5)
-myCashRegister.addItem(13)
-myCashRegister.addItem(10)
+            except ValueError:
+                print("**** Value entered must be a valid quantity!!!")
+                continue
 
-print(myCashRegister.getCount())
+            myCashRegister.addItem(myprice)  # add the price entered to cart
 
-# myobjs = list()
-# myobjs.append(CashRegister(1))
-# myobjs.append(CashRegister(2.55))
-# myobjs.append(CashRegister(6.5))
-# myobjs.append(CashRegister(14.5333))
+        else:
+            continue
 
-# print(CashRegister.itemcount)
-# print(len(myobjs))
-# print(myobjs)
+    # time to display the cart totals
+    myGrandTotal = locale.currency(myCashRegister.getTotal(), grouping=True)  # total with local currency locale format
 
-print(locale.currency(myCashRegister.getTotal(), grouping=True))  # print with local currency locale
+    myNote = "\nCount of items: {0:>" + str(len(myGrandTotal) - 3) + "}"  # message to print with format inst
+    print(myNote.format(myCashRegister.getCount()))  # print count
+
+    myNote = "         Total: {0:>" + str(len(myGrandTotal)) + "}"  # message to print with format inst
+    print(myNote.format(myGrandTotal))  # print total
+
+if __name__ == "__main__":
+    main()

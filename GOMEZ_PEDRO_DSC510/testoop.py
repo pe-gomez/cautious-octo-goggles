@@ -33,6 +33,15 @@ class employee:
             return False
         return True
 
+    def __repr__(self):
+        return "Employee('{}', '{}', {})".format(self.first,self.last,self.pay)
+
+    def __str__(self):
+        return "{} - {}".format(self.fullname(),self.email)
+
+    def __add__(self, other):
+        return self.pay+other.pay
+
 class developer(employee):
 
     def __init__(self, first, last, pay, prog_lang):
@@ -70,10 +79,12 @@ emp_2 = employee('test', 'user', 60000, 282)
 
 mgr_1=manager('peg','smith',100000,0,[emp_1])
 
+print(emp_1+emp_2)
+
 print(isinstance(mgr_1,manager)) #tells if a class is a subclass of other
 
 mgr_1.print_emps()
-
+#
 # first, last, pay = 'jon-doe-7000'.split('-')
 # emp_3 = employee(first, last, pay, 200)
 emp_3 = employee.from_string('jon-doe-7000')
@@ -81,7 +92,14 @@ emp_3 = employee.from_string('jon-doe-7000')
 print(emp_1.first, emp_1.email, emp_1.temperatureF)
 print(emp_2.first, emp_2.email, emp_2.temperatureF)
 
+print(emp_3)
 print(emp_3.__dict__)
+print (repr(emp_3))
+print (str(emp_3))
+
+print(1+2)
+print(int.__add__(1,2))
+
 
 '''
 #from datetime \
