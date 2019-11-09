@@ -30,7 +30,6 @@ def isunixdt(inval):
 my5day = dict()  # the 5 day dictionary for heading info
 my5max = dict()  # the 5 day dictionary for max day temp
 my5min = dict()  # the 5 day dictionary for min day temp
-
 my5maxw = dict()  # the 5 day dictionary for max day weather description
 my5minw = dict()  # the 5 day dictionary for min day weather description
 
