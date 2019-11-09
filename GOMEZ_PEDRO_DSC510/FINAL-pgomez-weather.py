@@ -22,13 +22,12 @@ import re  # call the regular expression module (for pattern matching)
 from datetime import datetime, \
     timedelta  # for UNIX time transformations (https://www.programiz.com/python-programming/datetime/strftime)
 import pycountry  # fuzzy resolution of country (https://pypi.org/project/pycountry/)
-
-import json
+import json  # json parsing
 
 
 def isunixdt(inval):
     # return true if inval is numeric of 10 digits (validating unix dt)
-    # this method will stop working properly on year 2018 because of signed 32 bit unix utc time issue
+    # this method will stop working properly on year 2038 because of signed 32 bit unix utc time issue
     # (so don't use after then ... :-) )
     return re.match("^\d{10}$", str(inval)) != None
 
@@ -45,15 +44,15 @@ my5min = dict()  # the 5 day dictionary for min day temp
 my5maxw = dict()  # the 5 day dictionary for max day weather description
 my5minw = dict()  # the 5 day dictionary for min day weather description
 
-# pycountry.countries.get(alpha_2='DE')
-mycountrycode = pycountry.countries.search_fuzzy('englan')[0].alpha_2
-print(mycountrycode)
+# # pycountry.countries.get(alpha_2='DE')
+# mycountrycode = pycountry.countries.search_fuzzy('englan')[0].alpha_2
+# print(mycountrycode)
 # print(mycountrycode.name)
 
 myinput = input("Please enter a US 5 digit Zip Code or World city : ")
 if is5zip(myinput):
     myURLq = "&zip=" + myinput.strip()
-    print(myURLq)
+    # print(myURLq)
 else:
     mycity = myinput.strip()
     myinput = ""
@@ -63,18 +62,18 @@ else:
             myURLq = "&q=" + mycity + ",US"
             myinput = "Y"
         else:
-            mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name
-            myinput = input("Did you mean {} ? (Y/N)".format(mycountrycode))
+            mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name  #do a fuzzy match to the country entered
+            myinput = input("Did you mean {} ? (Y/y for YES, anything else for NO)".format(mycountrycode))
             if myinput in ['Y', 'y']:
-                mycountrycode = pycountry.countries.get(name=mycountrycode).alpha_2
+                mycountrycode = pycountry.countries.get(name=mycountrycode).alpha_2 # find country code for the country
                 myURLq = "&q=" + mycity + "," + mycountrycode
 
     print(myURLq)
 try:
     response = requests.get(
         "http://api.openweathermap.org/data/2.5/forecast?APPID=1d6396e456b004718aba6387a0e99fc7&mode=json&units=imperial" + myURLq)
-except requests.exceptions.RequestException as e:  # This is the correct syntax
-    print(e)
+except requests.exceptions.RequestException as myerror:  # print any exception errors posted by the requests
+    print(myerror)
 
 if response:
     myerror = json.loads(response.text)['message']
@@ -92,7 +91,8 @@ else:
 # loaded_json = json.loads(source)
 # source = None
 loaded_json = response.json()
-response = None
+response.close()
+response= None
 
 # print(json.dumps(data, indent=2, sort_keys=True))
 # print(json.dumps(loaded_json, indent=2))
@@ -170,10 +170,13 @@ print(
         datetime.fromisoformat(my5day['sunrise']).strftime(
             '%B %d, %Y')))
 
-print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather thought the day"))
+print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather throughout the day"))
 print("-" * 4 + " " + "-" * 9 + " " + "-" * 9 + " " + "-" * 50)
 for key, value in my5max.items():
     if key != datetime.now().strftime('%Y--%m-%d'):
+        myweather=my5maxw[key] + " to " + my5minw[key]
+        if my5maxw[key] == my5minw[key]:
+            myweather = my5maxw[key]
+
         print("{0:4} {1:^9} {2:^9} {3}".format((datetime.fromisoformat(key).strftime('%a')), round(my5max[key]),
-                                               round(my5min[key]),
-                                               my5maxw[key] + " to " + my5minw[key]))
+                                               round(my5min[key]), myweather))
