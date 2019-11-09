@@ -2,20 +2,16 @@
 #   Name: Pedro E Gomez
 #   Date: 2-nov-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
-#   Desc: demonstrate our knowledge of Python object oriented programming concepts by creating a simple cash register program
+#   Desc: a simple cash register program
 
-# Your program must have a header.
-# Your program must have a welcome message for the user.
-# Your program must have one class called CashRegister.
-# Your program will have an instance method called addItem which takes one parameter for price. The method should also keep track of the number of items in your cart.
-# Your program should have two getter methods.
-# getTotal – returns totalPrice
-# getCount – returns the itemCount of the cart
-# Your program must create an instance of the CashRegister class.
-# Your program should have a loop which allows the user to continue to add items to the cart until they request to quit.
-# Your program should print the total number of items in the cart.
-# Your program should print the total $ amount of the cart.
-# The output should be formatted as currency. Be sure to investigate the locale class. You will need to call locale.setlocale and locale.currency.
+# one class called CashRegister.  an instance of the CashRegister class is used as the "cash register"
+# addItem  one parameter for price; also keep track of the number of items in  cart.
+# getTotal getter methods – returns totalPrice
+# getCount getter methods – returns the itemCount of the cart
+
+#  program loop add items to the cart until user responts with q or Q to quit.
+#  program  prints the total number of items in the cart.
+#  program prints the total $ amount of the cart (formatted as currency, per  locale class)
 
 
 import locale  # currency formatting
@@ -38,8 +34,8 @@ def mydaypart():
 class CashRegister:
 
     def __init__(self):  # take no arguments on the instance creation
-        self.itemcount = 0  # initialize on the instance cration
-        self.itemtotal = 0  # initialize on the instance cration
+        self.itemcount = 0  # initialize to 0 on the instance creation
+        self.itemtotal = 0  # initialize to 0 on the instance creation
 
     def addItem(self, price):
         self.itemcount += 1
@@ -79,17 +75,16 @@ def main():
         else:
             continue
 
-    # time to display the cart totals
     # total with local currency locale format
     myGrandTotal = locale.currency(myCashRegister.getTotal(), grouping=True)
 
-    # message to print with format inst
+    # print the item count (right justified, depending on max lenght)
     myNote = "\nCount of items: {0:>" + str(len(myGrandTotal) - 3) + "}"
-    print(myNote.format(myCashRegister.getCount()))  # print count
+    print(myNote.format(myCashRegister.getCount()))
 
-    # message to print with format inst
+    # print the total (right justified, depending on max lenght)
     myNote = "         Total: {0:>" + str(len(myGrandTotal)) + "}"
-    print(myNote.format(myGrandTotal))  # print total
+    print(myNote.format(myGrandTotal))
 
 
 if __name__ == "__main__":
