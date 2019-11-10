@@ -16,11 +16,11 @@
 
 # Use try blocks when establishing connections to the webservice. You must print a message to the user indicating whether or not the connection was successful
 
-import sys
 import requests  # calling the world
 import re  # call the regular expression module (for pattern matching)
-from datetime import datetime, \
-    timedelta  # for UNIX time transformations (https://www.programiz.com/python-programming/datetime/strftime)
+
+# for UNIX time transformations (https://www.programiz.com/python-programming/datetime/strftime)
+from datetime import datetime
 import pycountry  # fuzzy resolution of country code (https://pypi.org/project/pycountry/)
 import json  # json parsing
 
@@ -37,14 +37,15 @@ def is5zip(inval):
     # method does not work for other countries
     return re.match("^(?!0{3})[0-9]{3,5}$", str(inval)) != None
 
-def getURLq():   # builds city,country query switch (e.g.  &zip=90210  or &q=beverly hills,US)
 
-    myinput=""
-    while myinput =="":
+def getURLq():  # builds city,country query switch (e.g.  &zip=90210  or &q=beverly hills,US)
+
+    myinput = ""
+    while myinput == "":
         myinput = input("Please enter a US 5 digit Zip Code or World city : ")
-        if myinput.isnumeric() and is5zip(myinput)==False:
+        if myinput.isnumeric() and is5zip(myinput) == False:
             print('\x1b[31m ERROR! Numeric entry does not match US 5 digit zip format, Please try again!.\x1b[0m')
-            myinput=""
+            myinput = ""
 
     if is5zip(myinput):
         myURLq = "&zip=" + myinput.strip()
@@ -59,9 +60,10 @@ def getURLq():   # builds city,country query switch (e.g.  &zip=90210  or &q=bev
                 myinput = "Y"
             else:
                 try:
-                    mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name  # do a fuzzy match to the country entere
+                    # do a fuzzy match to the country entered
+                    mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name
 
-                #throw an error if mycountrycode failed on any lookup
+                # throw an error if mycountrycode failed on fuzzy match it
                 except:
                     print('\x1b[31m ERROR! Unable to resolve country, please try again.\x1b[0m')
                     myinput = ""
@@ -69,22 +71,24 @@ def getURLq():   # builds city,country query switch (e.g.  &zip=90210  or &q=bev
 
                 myinput = input("Did you mean '{}' ? (Y/y for YES, anything else for NO) ".format(mycountrycode))
                 if myinput in ['Y', 'y']:
-                    mycountrycode = pycountry.countries.get(name=mycountrycode).alpha_2 # find country code for the country
+                    mycountrycode = pycountry.countries.get(
+                        name=mycountrycode).alpha_2  # find country code for the country
                     myURLq = "&q=" + mycity + "," + mycountrycode
 
     # print(myURLq)
     return myURLq
 
-def     get5fromjson(loaded_json,my5day ,my5max ,my5min ,my5maxw ,my5minw):  # populated dictonaries from JSON
+
+def get5fromjson(loaded_json, my5day, my5max, my5min, my5maxw, my5minw):  # populate dictonaries from JSON
 
     my5day.update({'timezone': loaded_json['city']['timezone']})
 
     # parce the city from json, storing wanted parameters in our forecast dictionary
     for key, value in loaded_json['city'].items():
-        if key in ['name', 'country', 'sunrise', 'sunset','timezone']:
+        if key in ['name', 'country', 'sunrise', 'sunset', 'timezone']:
             if key not in my5day.keys():
                 if key in ['sunrise', 'sunset'] and isunixdt(value):
-                    mydate = str(datetime.utcfromtimestamp(value+my5day['timezone']))  # convert the unix date
+                    mydate = str(datetime.utcfromtimestamp(value + my5day['timezone']))  # convert the unix date
                     my5day.update({key: mydate})
                 else:
                     my5day.update({key: value})
@@ -95,8 +99,9 @@ def     get5fromjson(loaded_json,my5day ,my5max ,my5min ,my5maxw ,my5minw):  # p
 
     for x in loaded_json['list']:
         # print (x)
-        #myday = datetime.fromisoformat(x['dt_txt']).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
-        myday = datetime.utcfromtimestamp(x['dt']+my5day['timezone']).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
+        # myday = datetime.fromisoformat(x['dt_txt']).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
+        myday = datetime.utcfromtimestamp(x['dt'] + my5day['timezone']).strftime(
+            '%Y-%m-%d')  # strip time from stamp, just keep date
 
         # print(myday)
         if myday not in my5max.keys():
@@ -116,7 +121,8 @@ def     get5fromjson(loaded_json,my5day ,my5max ,my5min ,my5maxw ,my5minw):  # p
 
         my5minw.update({myday: x['weather'][0]['description']})
 
-def    display5(my5day ,my5max ,my5min ,my5maxw ,my5minw):  # print the forecast report
+
+def display5(my5day, my5max, my5min, my5maxw, my5minw):  # print the forecast report
     # Day High Temp Low Temp   Wather thought the day
     # --- --------- ---------- -----------------------------------------------
     # \x1b[34m for blue
@@ -124,9 +130,10 @@ def    display5(my5day ,my5max ,my5min ,my5maxw ,my5minw):  # print the forecast
     # \x1b[0m for no-color
 
     # Headings
-    print("\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
-        my5day['name'],
-        my5day['country']))
+    print(
+        "\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
+            my5day['name'],
+            my5day['country']))
     print(
         "Sunrise: {0}  Sunset: {1} for {2} \x1b[0m\n".format(
             datetime.fromisoformat(my5day['sunrise']).strftime('%I:%M %p'),
@@ -140,7 +147,7 @@ def    display5(my5day ,my5max ,my5min ,my5maxw ,my5minw):  # print the forecast
     # data
     for key, value in my5max.items():
         # if key != datetime.fromisoformat(my5day['sunrise']).strftime('%Y--%m-%d'):
-        myweather=my5maxw[key] + " to " + my5minw[key]
+        myweather = my5maxw[key] + " to " + my5minw[key]
         if my5maxw[key] == my5minw[key]:
             myweather = my5maxw[key]
 
@@ -155,10 +162,10 @@ def main():
     my5maxw = dict()  # the dictionary for max day weather description (dates are key)
     my5minw = dict()  # the dictionary for min day weather description (dates are key)
 
-    myinput="Y"
-    while myinput  in ['y', 'Y']:  # add to cart until user presses q/Q
+    myinput = "Y"
+    while myinput in ['y', 'Y']:  # add to cart until user presses q/Q
 
-        myURLq=getURLq() # fetch location from user
+        myURLq = getURLq()  # fetch location from user
 
         try:
             response = requests.get(
@@ -172,7 +179,7 @@ def main():
         else:
             myerror = json.loads(response.text)['message']
             print('\x1b[31m ERROR! API Response error: {0} \x1b[0m'.format(myerror))
-            myinput="Y"
+            myinput = "Y"
             continue
 
         # with open(
@@ -184,7 +191,7 @@ def main():
         # source = None
         loaded_json = response.json()
         response.close()
-        response= None
+        response = None
 
         # print(json.dumps(data, indent=2, sort_keys=True))
         # print(json.dumps(loaded_json, indent=2))
@@ -203,7 +210,7 @@ def main():
         my5min.clear()
         my5maxw.clear()
         my5minw.clear()
-        get5fromjson(loaded_json,my5day ,my5max ,my5min ,my5maxw ,my5minw)
+        get5fromjson(loaded_json, my5day, my5max, my5min, my5maxw, my5minw)
 
         # print(my5day)
         # print(my5max)
@@ -212,7 +219,7 @@ def main():
         # print(my5minw)
 
         # print the weather forecast
-        display5(my5day ,my5max ,my5min ,my5maxw ,my5minw)
+        display5(my5day, my5max, my5min, my5maxw, my5minw)
 
         myinput = input("\nExtract another forecast? (y/Y for YES, any other to QUIT): ")
 
