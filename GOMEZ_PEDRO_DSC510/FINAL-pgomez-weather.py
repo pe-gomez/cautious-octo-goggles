@@ -21,7 +21,7 @@ import requests  # calling the world
 import re  # call the regular expression module (for pattern matching)
 from datetime import datetime, \
     timedelta  # for UNIX time transformations (https://www.programiz.com/python-programming/datetime/strftime)
-import pycountry  # fuzzy resolution of country (https://pypi.org/project/pycountry/)
+import pycountry  # fuzzy resolution of country code (https://pypi.org/project/pycountry/)
 import json  # json parsing
 
 
@@ -49,7 +49,13 @@ my5minw = dict()  # the 5 day dictionary for min day weather description
 # print(mycountrycode)
 # print(mycountrycode.name)
 
-myinput = input("Please enter a US 5 digit Zip Code or World city : ")
+myinput=""
+while myinput =="":
+    myinput = input("Please enter a US 5 digit Zip Code or World city : ")
+    if myinput.isnumeric() and is5zip(myinput)==False:
+        print('\x1b[31m ERROR! Numeric entry does not match US 5 digit zip format, Please try again!.\x1b[0m')
+        myinput=""
+
 if is5zip(myinput):
     myURLq = "&zip=" + myinput.strip()
     # print(myURLq)
@@ -62,13 +68,21 @@ else:
             myURLq = "&q=" + mycity + ",US"
             myinput = "Y"
         else:
-            mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name  #do a fuzzy match to the country entered
-            myinput = input("Did you mean {} ? (Y/y for YES, anything else for NO)".format(mycountrycode))
+            try:
+                mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name  # do a fuzzy match to the country entere
+
+            #throw an error if mycountrycode failed on any lookup
+            except:
+                print('\x1b[31m ERROR! Unable to resolve country, please try again.\x1b[0m')
+                myinput = ""
+                continue
+
+            myinput = input("Did you mean '{}' ? (Y/y for YES, anything else for NO) ".format(mycountrycode))
             if myinput in ['Y', 'y']:
                 mycountrycode = pycountry.countries.get(name=mycountrycode).alpha_2 # find country code for the country
                 myURLq = "&q=" + mycity + "," + mycountrycode
 
-    print(myURLq)
+    # print(myURLq)
 try:
     response = requests.get(
         "http://api.openweathermap.org/data/2.5/forecast?APPID=1d6396e456b004718aba6387a0e99fc7&mode=json&units=imperial" + myURLq)
@@ -77,10 +91,10 @@ except requests.exceptions.RequestException as myerror:  # print any exception e
 
 if response:
     myerror = json.loads(response.text)['message']
-    print('\x1b[32m SUCCESS! able to connect. {0} \x1b[0m'.format(myerror))
+    print('\x1b[32m SUCCESS! API able to connect. {0} \x1b[0m'.format(myerror))
 else:
     myerror = json.loads(response.text)['message']
-    print('\x1b[31m ERROR! Response error: {0} \x1b[0m'.format(myerror))
+    print('\x1b[31m ERROR! API Response error: {0} \x1b[0m'.format(myerror))
     sys.exit(1)
 
 # with open(
@@ -145,11 +159,11 @@ for x in loaded_json['list']:
 
     my5minw.update({myday: x['weather'][0]['description']})
 
-print(my5day)
-print(my5max)
-print(my5min)
-print(my5maxw)
-print(my5minw)
+# print(my5day)
+# print(my5max)
+# print(my5min)
+# print(my5maxw)
+# print(my5minw)
 
 # dt = (datetime.fromtimestamp(unix_ts) - timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -160,7 +174,7 @@ print(my5minw)
 # \x1b[4m for underline
 # \x1b[0m for no-color
 
-print("\x1b[34m\n\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
+print("\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
     my5day['name'],
     my5day['country']))
 print(
@@ -168,7 +182,7 @@ print(
         datetime.fromisoformat(my5day['sunrise']).strftime('%I:%M %p'),
         datetime.fromisoformat(my5day['sunset']).strftime('%I:%M %p'),
         datetime.fromisoformat(my5day['sunrise']).strftime(
-            '%B %d, %Y')))
+            '%A %B %d, %Y')))
 
 print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather throughout the day"))
 print("-" * 4 + " " + "-" * 9 + " " + "-" * 9 + " " + "-" * 50)
