@@ -1,20 +1,23 @@
 #   File: FINAL-pgomez-weather
 #   Name: Pedro E Gomez
-#   Date: 8-nov-2019
+#   Date: 11-nov-2019
 # Course: DSC510-T303 Introduction to Programming (2201-1)
-#   Desc: Weather Program
+#   Desc: City Weather Forecast Reporting Program
 
-# #Create a Python Application which asks the user for their zip code or city.
-# Use the zip code or city name in order to obtain weather forecast data from OpenWeatherMap.
-# Display the weather forecast in a readable format to the user.
-# Use comments within the application where appropriate in order to document what the program is doing.
-# Use functions including a main function.
-# Allow the user to run the program multiple times to allow them to look up weather conditions for multiple locations.
-# Validate whether the user entered valid data. If valid data isn’t presented notify the user.
-# Use the Requests library in order to request data from the webservice.
-# Use Try blocks to ensure that your request was successful. If the connection was not successful display a message to the user.
-
-# Use try blocks when establishing connections to the webservice. You must print a message to the user indicating whether or not the connection was successful
+# user proves either US 5 digit zip code or world city (and country).
+# weather forecast data from OpenWeatherMap
+#   * free 5-day forecast api is used
+#   * since forecast data is provided for future timeframes in 3-hr increments, that data is
+#     analysed and transformed into a daily forecast.
+#
+# User has the ability to re-run new reports for other cities (one city at a time)
+#
+# Program makes us of the following modules:
+#      requests (HTTP for Humans), for data extraction of remote API data through HTTP.
+#      re (Regular Expressions), for input and data validation based on patters.
+#      datetime (Encapsulation of date/time values.), for manipulation of UNIX, UTC, and ISO timestamps
+#      pycountry (ISO databases for country standards), for fuzzy logic resolution of country/country code information (PACKAGE INSTALLATION REQUIRED)
+#      json (JavaScript Object Notation package), for parsing of json data into lists/dictionaries
 
 import requests  # calling the world
 import re  # call the regular expression module (for pattern matching)
@@ -23,7 +26,7 @@ import re  # call the regular expression module (for pattern matching)
 from datetime import datetime
 import pycountry  # fuzzy resolution of country code (https://pypi.org/project/pycountry/)
 import json  # json parsing
-
+import locale  # localizing defaults and formatting (https://pymotw.com/3/locale/)
 
 class clsWeather:
 
@@ -32,39 +35,43 @@ class clsWeather:
 
         self.varCityName = ""
         self.varCountryName = ""
+        self.varunits = "Fahrenheit"
         self.varTimezone = 0
         self.varSunrise = 0
         self.varSunset = 0
 
         self.cntNextIndex = 0  # next available index to use in lists (for appends)
-        self.dicDay2IndexXF = dict()  # day to index location in lists (cross-reference)
+        self.dicDay2IndexXF = dict()  # day key to index location in lists (cross-reference)
 
-        # Captured dayly parameters
-        #       x-referenced to the day via the dicDay2IndexXF
+        # Captured daily parameters lists
+        #       x-referenced to the day via the dicDay2IndexXF dictionary
         # MaxT - Hith Temp
         # MinT - Min Temp
-        # MaxWD - First Weather description of day
-        # MinWD - Last Weather description of day
+        # LastWD - First Weather description of day
+        # FirstWD - Last Weather description of day
         self.lstMaxT = []
         self.lstMinT = []
         self.lstLastWD = []
         self.lstFirstWD = []
 
-        # Corresponding Timestanps of the Captured dayly parameters (in UNIX format, adjusted for timezone)
-        #       x-referenced to the day via the dicDay2IndexXF
+        # Corresponding Timestanps of the Captured daily parameters (in UNIX format, adjusted for timezone)
+        #       also x-referenced to the day via the dicDay2IndexXF dictionary
+        #       Timestamps are not necessary if JSON info is always presented in sequential order
+        #           since API doc did not state sequential presentation, a sequential order cannot be assumed.
         self.lstMaxTUtime = []
         self.lstMinTUtime = []
         self.lstLastWDUtime = []
         self.lstFirstWDUtime = []
 
-    # add/update daily data
     def putrow(self, myOriginalDT, mytemp_max, mytemp_min, mydescription):
-        mydt = myOriginalDT + self.varTimezone
+        # add/update daily data into data lists
+
+        mydt = myOriginalDT + self.varTimezone  # adjust time for city timezone
         mydtkey = datetime.utcfromtimestamp(mydt).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
 
         # new daily entry (judged by the cross-ref)
         if mydtkey not in self.dicDay2IndexXF.keys():
-            # new entry on the cross-reference dictionary - key to list indexes
+            # new entry on the cross-reference dictionary (key to list indexes)
             self.dicDay2IndexXF.update({mydtkey: self.cntNextIndex})
 
             # weather attributes for the day
@@ -83,7 +90,7 @@ class clsWeather:
 
         # updade of current daily entry
         else:
-            mylst_index = self.dicDay2IndexXF[mydtkey]
+            mylst_index = self.dicDay2IndexXF[mydtkey]  # get the index in lists for the key being processed
 
             # update self temp max if lower than new for the day
             if self.lstMaxT[mylst_index] < mytemp_max:
@@ -106,8 +113,10 @@ class clsWeather:
                 self.lstLastWDUtime[mylst_index] = mydt
         return
 
-    # Returns a list of 4 formatted data elements for report from the given date key
     def getrow_report(self, mydtkey):
+        # Returns a list of 4 formatted data elements (in list form) for report from the given date key
+        # [Abreviated day for data, Rounded Max Temp, Rounded Min Temp, built described weather]
+        # for example: ["Thu",44,37,"overcast clouds"]
 
         if mydtkey not in self.dicDay2IndexXF.keys():
             return ["", 0, 0, "ERROR date not found: " + mydtkey]
@@ -124,21 +133,23 @@ class clsWeather:
         return
 
 
-
 def isunixdt(inval):
     # return true if inval is numeric of 10 digits (validating unix dt)
     # this method will stop working properly on year 2038 because of signed 32 bit unix utc time issue
     # (so don't use after then ... :-) )
+
     return re.match("^\d{10}$", str(inval)) != None
 
 
 def is5zip(inval):
     # return true if inval appears to be a valid 5 digit US zip code (i.e. at most 3 leading 0s, with 5 total digits)
     # method does not work for other countries
+
     return re.match("^(?!0{3})[0-9]{3,5}$", str(inval)) != None
 
 
-def getURLq():  # builds city,country query switch (e.g.  &zip=90210  or &q=beverly hills,US)
+def getURLq():
+    # builds city,country query switch (e.g.  &zip=90210  or &q=beverly hills,US)
 
     myinput = ""
     while myinput == "":
@@ -147,23 +158,33 @@ def getURLq():  # builds city,country query switch (e.g.  &zip=90210  or &q=beve
             print('\x1b[31m ERROR! Numeric entry does not match US 5 digit zip format, Please try again!.\x1b[0m')
             myinput = ""
 
-    if is5zip(myinput):
+    if is5zip(myinput):  # user provided a US 5 digit zip (no country needed for API)
         myURLq = "&zip=" + myinput.strip()
-        # print(myURLq)
-    else:
-        mycity = myinput.strip()
+
+    else:  # figure out the country belonging to the city
+        mycity = myinput.strip().title()
         myinput = ""
         while myinput not in ['Y', 'y']:
-            myinput = input("In what country is {0} in? (simply hit ENTER for US, or enter country) : ".format(mycity))
+
+            # set default country to use (based on locale)
+            myinput = locale.getlocale()[0][locale.getlocale()[0].find("_") + 1:]
+            try:
+                # attempt do a fuzzy match to the country in the locale (to serve as default country code)
+                mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].alpha_2
+            # go with US if mycountrycode failed on fuzzy match
+            except:
+                mycountrycode = 'US'
+
+            myinput = input("In what country is {0} in? (simply hit ENTER for {1}, or enter country) : ".format(mycity, mycountrycode))
             if myinput == "":
-                myURLq = "&q=" + mycity + ",US"
+                myURLq = "&q=" + mycity + "," + mycountrycode  # build the zip query portion of URL (US is deault)
                 myinput = "Y"
             else:
                 try:
-                    # do a fuzzy match to the country entered
+                    # attempt do a fuzzy match to the country entered (to better resolve country code)
                     mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name
 
-                # throw an error if mycountrycode failed on fuzzy match it
+                # throw an error if mycountrycode failed on fuzzy match
                 except:
                     print('\x1b[31m ERROR! Unable to resolve country, please try again.\x1b[0m')
                     myinput = ""
@@ -171,59 +192,16 @@ def getURLq():  # builds city,country query switch (e.g.  &zip=90210  or &q=beve
 
                 myinput = input("Did you mean '{}' ? (Y/y for YES, anything else for NO) ".format(mycountrycode))
                 if myinput in ['Y', 'y']:
+                    # country confirmed, now resolve the 2-digit country code
                     mycountrycode = pycountry.countries.get(
                         name=mycountrycode).alpha_2  # find country code for the country
-                    myURLq = "&q=" + mycity + "," + mycountrycode
+                    myURLq = "&q=" + mycity + "," + mycountrycode  # build the city query portion of URL
 
-    # print(myURLq)
     return myURLq
 
 
-def get5fromjson(loaded_json, my5day, my5max, my5min, my5maxw, my5minw):  # populate dictonaries from JSON
-
-    my5day.update({'timezone': loaded_json['city']['timezone']})
-
-    # parce the city from json, storing wanted parameters in our forecast dictionary
-    for key, value in loaded_json['city'].items():
-        if key in ['name', 'country', 'sunrise', 'sunset', 'timezone']:
-            if key not in my5day.keys():
-                if key in ['sunrise', 'sunset'] and isunixdt(value):
-                    mydate = str(datetime.utcfromtimestamp(value + my5day['timezone']))  # convert the unix date
-                    my5day.update({key: mydate})
-                else:
-                    my5day.update({key: value})
-
-    # get full name of the country (change ISO code to full common name)
-    mycountrycode = my5day['country']
-    my5day.update({'country': pycountry.countries.get(alpha_2=mycountrycode).name})
-
-    for x in loaded_json['list']:
-        # print (x)
-        # myday = datetime.fromisoformat(x['dt_txt']).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
-        myday = datetime.utcfromtimestamp(x['dt'] + my5day['timezone']).strftime(
-            '%Y-%m-%d')  # strip time from stamp, just keep date
-
-        # print(myday)
-        if myday not in my5max.keys():
-            my5max.update({myday: float(x['main']['temp_max'])})
-
-        if my5max[myday] < x['main']['temp_max']:
-            my5max.update({myday: float(x['main']['temp_max'])})
-
-        if myday not in my5min.keys():
-            my5min.update({myday: float(x['main']['temp_min'])})
-
-        if my5min[myday] > x['main']['temp_min']:
-            my5min.update({myday: float(x['main']['temp_min'])})
-
-        if myday not in my5maxw.keys():
-            my5maxw.update({myday: x['weather'][0]['description']})
-
-        my5minw.update({myday: x['weather'][0]['description']})
-
-    return
-
-def get5fromjson2(loaded_json, myweather):  # populate the instance weather class from JSON
+def getfromjson(loaded_json, myweather):
+    # populate the instance weather class from JSON data
 
     # parse the city header data from json
     for key, value in loaded_json['city'].items():
@@ -237,7 +215,7 @@ def get5fromjson2(loaded_json, myweather):  # populate the instance weather clas
     myweather.varSunrise += myweather.varTimezone
     myweather.varSunset += myweather.varTimezone
 
-    # get full name of the country (change ISO code to full common name)
+    # derive full name of the country (change ISO code to full common name)
     mycountrycode = myweather.varCountryName
     myweather.varCountryName = pycountry.countries.get(alpha_2=mycountrycode).name
 
@@ -248,58 +226,25 @@ def get5fromjson2(loaded_json, myweather):  # populate the instance weather clas
         mytemp_min = x['main']['temp_min']
         mydescription = x['weather'][0]['description']
 
-        # send thee info to the weather class to be further reviewed and stored into the day info
+        # send the info to the weather class to be further reviewed and stored into the day info
         myweather.putrow(myOriginalDT, mytemp_max, mytemp_min, mydescription)
 
     return
 
-def display5(my5day, my5max, my5min, my5maxw, my5minw):  # print the forecast report
-    # Day High Temp Low Temp   Wather thought the day
+
+def reportforecast(myweather):
+    # print the forecast report, in the following format
+    # Day High Temp Low Temp   Weather thought the day
     # --- --------- ---------- -----------------------------------------------
+
     # \x1b[34m for blue
     # \x1b[4m for underline
     # \x1b[0m for no-color
 
-    # Headings
+    # Table intro Headings
     print(
-        "\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
-            my5day['name'],
-            my5day['country']))
-    print(
-        "Sunrise: {0}  Sunset: {1} for {2} \x1b[0m\n".format(
-            datetime.fromisoformat(my5day['sunrise']).strftime('%I:%M %p'),
-            datetime.fromisoformat(my5day['sunset']).strftime('%I:%M %p'),
-            datetime.fromisoformat(my5day['sunrise']).strftime(
-                '%A %B %d, %Y')))
-
-    print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather throughout the day"))
-    print("-" * 4 + " " + "-" * 9 + " " + "-" * 9 + " " + "-" * 50)
-
-    # data
-    for key, value in my5max.items():
-        # if key != datetime.fromisoformat(my5day['sunrise']).strftime('%Y--%m-%d'):
-        myweather = my5maxw[key] + " to " + my5minw[key]
-        if my5maxw[key] == my5minw[key]:
-            myweather = my5maxw[key]
-
-        print("{0:4} {1:^9} {2:^9} {3}".format((datetime.fromisoformat(key).strftime('%a')), round(my5max[key]),
-                                               round(my5min[key]), myweather))
-
-    return
-
-
-def display52(myweather):  # print the forecast report
-    # Day High Temp Low Temp   Wather thought the day
-    # --- --------- ---------- -----------------------------------------------
-    # \x1b[34m for blue
-    # \x1b[4m for underline
-    # \x1b[0m for no-color
-
-    # Headings
-    print(
-        "\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in Fahrenheit, Using Local {0} time.".format(
-            myweather.varCityName,
-            myweather.varCountryName))
+        "\x1b[34m\nForecast for \x1b[4m{0} ({1})\x1b[0m\x1b[34m - Temperature in {2}, Using Local {0} time.".format(
+            myweather.varCityName, myweather.varCountryName, myweather.varunits))
     print(
         "Sunrise: {0}  Sunset: {1} for {2} \x1b[0m\n".format(
             datetime.utcfromtimestamp(myweather.varSunrise).strftime('%I:%M %p'),
@@ -307,98 +252,79 @@ def display52(myweather):  # print the forecast report
             datetime.utcfromtimestamp(myweather.varSunrise).strftime(
                 '%A %B %d, %Y')))
 
+    # Column Headings
     print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather throughout the day"))
     print("-" * 4 + " " + "-" * 9 + " " + "-" * 9 + " " + "-" * 50)
 
     # data expressed in sorted form (in case lson dates were not in order)
-    for key in sorted (myweather.dicDay2IndexXF.keys()):
-
+    #   clsWeather method getrow_report generates the row data information
+    for key in sorted(myweather.dicDay2IndexXF.keys()):
         print("{0:4} {1:^9} {2:^9} {3}".format(*myweather.getrow_report(key)))
 
     return
 
-def main():
-    my5day = dict()  # the dictionary for heading info (timezone,name,country,sunrise,sunset)
-    my5max = dict()  # the dictionary for max day temp (dates are key)
-    my5min = dict()  # the dictionary for min day temp (dates are key)
-    my5maxw = dict()  # the dictionary for max day weather description (dates are key)
-    my5minw = dict()  # the dictionary for min day weather description (dates are key)
 
+def main():
+    x = locale.setlocale(locale.LC_ALL, '')  # setlocale
+    # is program being run in the US, used to set temperature units default
+    myinUS = re.match(".*United States+.*", str(locale.getlocale())) != None  # US locale identifyier
+
+    # default the units for the runs (all forecasts)
+    if myinUS:
+        myURLunits = "&units=imperial"
+        myinput = input("\nExtracting all forecasts in Fahrenheit. Switch to Celsius? (y/Y for YES, any other for NO): ")
+        if myinput in ['y', 'Y']:
+            myURLunits = "&units=metric"
+    if myinUS==False:
+        myURLunits = "&units=metric"
+        myinput = input("\nExtracting all forecasts in Celsius. Switch to Fahrenheit? (y/Y for YES, any other for NO): ")
+        if myinput in ['y', 'Y']:
+            myURLunits = "&units=imperial"
 
     myinput = "Y"
-    while myinput in ['y', 'Y']:  # add to cart until user presses q/Q
+    while myinput in ['y', 'Y']:  # add to cart until user presses something other than y/Y
 
         myURLq = getURLq()  # fetch location from user
 
+        # make the URL connections
         try:
             response = requests.get(
-                "http://api.openweathermap.org/data/2.5/forecast?APPID=1d6396e456b004718aba6387a0e99fc7&mode=json&units=imperial" + myURLq)
+                "http://api.openweathermap.org/data/2.5/forecast?APPID=1d6396e456b004718aba6387a0e99fc7&mode=json" + myURLunits + myURLq)
         except requests.exceptions.RequestException as myerror:  # print any exception errors posted by the requests
             print(myerror)
 
-        if response:
-            myerror = json.loads(response.text)['message']
+        myerror = json.loads(response.text)['message']
+        if response:  # API reports no issues on response==True
             print('\x1b[32m SUCCESS! API able to connect. {0} \x1b[0m'.format(myerror))
-        else:
-            myerror = json.loads(response.text)['message']
+
+        else:  # further catching of errors (from both requests and API)
             print('\x1b[31m ERROR! API Response error: {0} \x1b[0m'.format(myerror))
-            myinput = "Y"
+            myinput = "Y"  # return to the user input
             continue
 
-        # with open(
-        #         "C:\\Users\\peg_o\\Desktop\\Bellevue\\DSC510-T303 Introduction to Programming\\finalProject\\78717jsonIMPERIAL.txt",
-        #         "r") as response:
-        #     source = response.read()
-
-        # loaded_json = json.loads(source)
-        # source = None
+        # grab json info
         loaded_json = response.json()
         response.close()
-        response = None
+        response = None  # no longer need response object
 
-        # print(json.dumps(data, indent=2, sort_keys=True))
-        # print(json.dumps(loaded_json, indent=2))
-
-        # for x in loaded_json:
-        # 	print("%s: %s" % (x, loaded_json[x]))
-
-        # for key,value in loaded_json['list'].items():
-        #     print(key,value)
-
-        # x=loaded_json['list'][0]
-
-        # extract the dictionaries from json
-        my5day.clear()
-        my5max.clear()
-        my5min.clear()
-        my5maxw.clear()
-        my5minw.clear()
-
-        if 'myweather' in locals():  #delete the instance of clsWeather if already exists
+        # create/delete clsWeather instance
+        if 'myweather' in locals():
             del myweather
         myweather = clsWeather()
+        if myURLunits == "&units=metric":  # register the temperature units in the class
+            myweather.varunits = "Celsius"
+        else:
+            myweather.varunits = "Fahrenheit"
 
-        get5fromjson(loaded_json, my5day, my5max, my5min, my5maxw, my5minw)
-
-        get5fromjson2(loaded_json, myweather)
-
-        print(my5day)
-        print(myweather.dicDay2IndexXF)
-        print(my5max)
-        print(myweather.lstMaxT)
-        print(my5min)
-        print(myweather.lstMinT)
-        print(my5maxw)
-        print(myweather.lstFirstWD)
-        print(my5minw)
-        print(myweather.lstLastWD)
+        # parse the weather data from json
+        getfromjson(loaded_json, myweather)
 
         # print the weather forecast
-        display5(my5day, my5max, my5min, my5maxw, my5minw)
-
-        display52(myweather)
+        reportforecast(myweather)
 
         myinput = input("\nExtract another forecast? (y/Y for YES, any other to QUIT): ")
+
+    return
 
 
 if __name__ == "__main__":
