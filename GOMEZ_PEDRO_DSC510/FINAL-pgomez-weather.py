@@ -6,9 +6,9 @@
 
 # user proves either US 5 digit zip code or world city (and country).
 # weather forecast data from OpenWeatherMap
-#   * free 5-day forecast api is used
+#   * free 5-day forecast API is used
 #   * since forecast data is provided for future timeframes in 3-hr increments, that data is
-#     analysed and transformed into a daily forecast.
+#     analyzed and transformed into a daily forecast.
 #
 # User has the ability to re-run new reports for other cities (one city at a time)
 #
@@ -18,6 +18,7 @@
 #      datetime (Encapsulation of date/time values.), for manipulation of UNIX, UTC, and ISO timestamps
 #      pycountry (ISO databases for country standards), for fuzzy logic resolution of country/country code information (PACKAGE INSTALLATION REQUIRED)
 #      json (JavaScript Object Notation package), for parsing of json data into lists/dictionaries
+#      locale (Cultural Localization), for deriving defaults based on user’s locale information
 
 import requests  # calling the world
 import re  # call the regular expression module (for pattern matching)
@@ -166,8 +167,10 @@ def getURLq():
         myinput = ""
         while myinput not in ['Y', 'y']:
 
-            # set default country to use (based on locale)
-            myinput = locale.getlocale()[0][locale.getlocale()[0].find("_") + 1:]
+            # set default country to use (based on guessed country from locale)
+            mycountrycode = locale.getlocale()[0]  # first guess at country - from locale
+            x = mycountrycode.find("_") + 1
+            myinput = mycountrycode[x:]  # refined guess at country
             try:
                 # attempt do a fuzzy match to the country in the locale (to serve as default country code)
                 mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].alpha_2
@@ -267,7 +270,7 @@ def reportforecast(myweather):
 def main():
     x = locale.setlocale(locale.LC_ALL, '')  # setlocale
     # is program being run in the US, used to set temperature units default
-    myinUS = re.match(".*United States+.*", str(locale.getlocale())) != None  # US locale identifyier
+    myinUS = x.find("United States") > 0  # US locale identifier (True for US)
 
     # default the units for the runs (all forecasts)
     if myinUS:
@@ -275,7 +278,7 @@ def main():
         myinput = input("\nExtracting all forecasts in Fahrenheit. Switch to Celsius? (y/Y for YES, any other for NO): ")
         if myinput in ['y', 'Y']:
             myURLunits = "&units=metric"
-    if myinUS==False:
+    else:
         myURLunits = "&units=metric"
         myinput = input("\nExtracting all forecasts in Celsius. Switch to Fahrenheit? (y/Y for YES, any other for NO): ")
         if myinput in ['y', 'Y']:
