@@ -48,12 +48,12 @@ class clsWeather:
         #       x-referenced to the day via the dicDay2IndexXF dictionary
         # MaxT - Hith Temp
         # MinT - Min Temp
-        # LastWD - First Weather description of day
-        # FirstWD - Last Weather description of day
+        # FirstWD - First  Weather description of day
+        # LastWD - Last Weather description of day
         self.lstMaxT = []
         self.lstMinT = []
-        self.lstLastWD = []
         self.lstFirstWD = []
+        self.lstLastWD = []
 
         # Corresponding Timestanps of the Captured daily parameters (in UNIX format, adjusted for timezone)
         #       also x-referenced to the day via the dicDay2IndexXF dictionary
@@ -68,6 +68,7 @@ class clsWeather:
         # add/update daily data into data lists
 
         mydt = myOriginalDT + self.varTimezone  # adjust time for city timezone
+        # build date key (e.g. '2019-11-11')
         mydtkey = datetime.utcfromtimestamp(mydt).strftime('%Y-%m-%d')  # strip time from stamp, just keep date
 
         # new daily entry (judged by the cross-ref)
@@ -87,9 +88,9 @@ class clsWeather:
             self.lstLastWDUtime.insert(self.cntNextIndex, mydt)
             self.lstFirstWDUtime.insert(self.cntNextIndex, mydt)
 
-            self.cntNextIndex += 1
+            self.cntNextIndex += 1 # current index used up, set the next available for lists
 
-        # updade of current daily entry
+        # update of current daily entry (since entry already exists for the day)
         else:
             mylst_index = self.dicDay2IndexXF[mydtkey]  # get the index in lists for the key being processed
 
@@ -119,38 +120,30 @@ class clsWeather:
         # [Abreviated day for data, Rounded Max Temp, Rounded Min Temp, built described weather]
         # for example: ["Thu",44,37,"overcast clouds"]
 
-        if mydtkey not in self.dicDay2IndexXF.keys():
+        if mydtkey not in self.dicDay2IndexXF.keys(): # error not likely to happen, but just in case
             return ["", 0, 0, "ERROR date not found: " + mydtkey]
 
         else:
+            # build the weather description from the first and last from the day
             if self.lstFirstWD[self.dicDay2IndexXF[mydtkey]] == self.lstLastWD[self.dicDay2IndexXF[mydtkey]]:
-                myweather = self.lstFirstWD[self.dicDay2IndexXF[mydtkey]]
+                myweather = self.lstFirstWD[self.dicDay2IndexXF[mydtkey]] # return one value if no change
             else:
                 myweather = self.lstFirstWD[self.dicDay2IndexXF[mydtkey]] + " to " + self.lstLastWD[
                     self.dicDay2IndexXF[mydtkey]]
 
             return [datetime.fromisoformat(mydtkey).strftime('%a'), round(self.lstMaxT[self.dicDay2IndexXF[mydtkey]]),
                     round(self.lstMinT[self.dicDay2IndexXF[mydtkey]]), myweather]
-        return
-
-
-def isunixdt(inval):
-    # return true if inval is numeric of 10 digits (validating unix dt)
-    # this method will stop working properly on year 2038 because of signed 32 bit unix utc time issue
-    # (so don't use after then ... :-) )
-
-    return re.match("^\d{10}$", str(inval)) != None
 
 
 def is5zip(inval):
-    # return true if inval appears to be a valid 5 digit US zip code (i.e. at most 3 leading 0s, with 5 total digits)
+    # return true if inval appears to be a valid 5 digit US zip code (i.e. at most 2 leading 0s, with 5 total digits)
     # method does not work for other countries
 
     return re.match("^(?!0{3})[0-9]{3,5}$", str(inval)) != None
 
 
 def getURLq():
-    # builds city,country query switch (e.g.  &zip=90210  or &q=beverly hills,US)
+    # builds city,country query switch (e.g.  &zip=90210  or &q=Beverly Hills,US)
 
     myinput = ""
     while myinput == "":
@@ -174,25 +167,31 @@ def getURLq():
             try:
                 # attempt do a fuzzy match to the country in the locale (to serve as default country code)
                 mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].alpha_2
+
             # go with US if mycountrycode failed on fuzzy match
             except:
                 mycountrycode = 'US'
 
             myinput = input("In what country is {0} in? (simply hit ENTER for {1}, or enter country) : ".format(mycity, mycountrycode))
+
+            # build the query portion of URL (using suggested country code)
             if myinput == "":
-                myURLq = "&q=" + mycity + "," + mycountrycode  # build the zip query portion of URL (US is deault)
+                myURLq = "&q=" + mycity + "," + mycountrycode
                 myinput = "Y"
+
+            # build the query query portion of URL (country needs to be defined)
             else:
                 try:
                     # attempt do a fuzzy match to the country entered (to better resolve country code)
                     mycountrycode = pycountry.countries.search_fuzzy(myinput)[0].name
 
-                # throw an error if mycountrycode failed on fuzzy match
+                # throw an error if mycountrycode failed on fuzzy match - go back and ask again
                 except:
                     print('\x1b[31m ERROR! Unable to resolve country, please try again.\x1b[0m')
                     myinput = ""
                     continue
 
+                # confirm the country (from fuzzy match)
                 myinput = input("Did you mean '{}' ? (Y/y for YES, anything else for NO) ".format(mycountrycode))
                 if myinput in ['Y', 'y']:
                     # country confirmed, now resolve the 2-digit country code
@@ -237,6 +236,7 @@ def getfromjson(loaded_json, myweather):
 
 def reportforecast(myweather):
     # print the forecast report, in the following format
+
     # Day High Temp Low Temp   Weather thought the day
     # --- --------- ---------- -----------------------------------------------
 
@@ -259,7 +259,7 @@ def reportforecast(myweather):
     print("{0:4} {1:^9} {2:^9} {3}".format("Day", "High Temp", "Low Temp", "Weather throughout the day"))
     print("-" * 4 + " " + "-" * 9 + " " + "-" * 9 + " " + "-" * 50)
 
-    # data expressed in sorted form (in case lson dates were not in order)
+    # express data in sorted form (in case json dates were not in order)
     #   clsWeather method getrow_report generates the row data information
     for key in sorted(myweather.dicDay2IndexXF.keys()):
         print("{0:4} {1:^9} {2:^9} {3}".format(*myweather.getrow_report(key)))
@@ -268,11 +268,11 @@ def reportforecast(myweather):
 
 
 def main():
-    x = locale.setlocale(locale.LC_ALL, '')  # setlocale
-    # is program being run in the US, used to set temperature units default
+    x = locale.setlocale(locale.LC_ALL, '')  # set locale
+    # is program being run in the US (or elsewhere), used to set temperature units default
     myinUS = x.find("United States") > 0  # US locale identifier (True for US)
 
-    # default the units for the runs (all forecasts)
+    # set units default for the runs (all forecasts) - but, confirm with user
     if myinUS:
         myURLunits = "&units=imperial"
         myinput = input("\nExtracting all forecasts in Fahrenheit. Switch to Celsius? (y/Y for YES, any other for NO): ")
@@ -285,24 +285,27 @@ def main():
             myURLunits = "&units=imperial"
 
     myinput = "Y"
-    while myinput in ['y', 'Y']:  # add to cart until user presses something other than y/Y
+    while myinput in ['y', 'Y']:  # run report until user presses something other than y/Y
 
-        myURLq = getURLq()  # fetch location from user
+        myURLq = getURLq()  # fetch city from user
 
-        # make the URL connections
+        # make the URL connections (using personal key for free 5day/3hr API)
         try:
             response = requests.get(
                 "http://api.openweathermap.org/data/2.5/forecast?APPID=1d6396e456b004718aba6387a0e99fc7&mode=json" + myURLunits + myURLq)
-        except requests.exceptions.RequestException as myerror:  # print any exception errors posted by the requests
+
+        # print any exception errors posted by the requests
+        except requests.exceptions.RequestException as myerror:
             print(myerror)
 
+        # print any additional messages returned (error or not)
         myerror = json.loads(response.text)['message']
         if response:  # API reports no issues on response==True
             print('\x1b[32m SUCCESS! API able to connect. {0} \x1b[0m'.format(myerror))
 
         else:  # further catching of errors (from both requests and API)
             print('\x1b[31m ERROR! API Response error: {0} \x1b[0m'.format(myerror))
-            myinput = "Y"  # return to the user input
+            myinput = "Y"  # return to the user input (on error)
             continue
 
         # grab json info
