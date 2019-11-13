@@ -12,9 +12,9 @@
 #
 # User has the ability to re-run new reports for other cities (one city at a time)
 #
-# Program makes us of the following modules:
+# Program makes use of the following modules:
 #      requests (HTTP for Humans), for data extraction of remote API data through HTTP.
-#      re (Regular Expressions), for input and data validation based on patters.
+#      re (Regular Expressions), for input and data validation based on patterns.
 #      datetime (Encapsulation of date/time values.), for manipulation of UNIX, UTC, and ISO timestamps
 #      pycountry (ISO databases for country standards), for fuzzy logic resolution of country/country code information (PACKAGE INSTALLATION REQUIRED)
 #      json (JavaScript Object Notation package), for parsing of json data into lists/dictionaries
